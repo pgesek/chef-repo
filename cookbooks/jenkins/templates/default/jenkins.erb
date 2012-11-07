@@ -53,3 +53,9 @@ AJP_PORT=-1
 # --argumentsRealm.$ADMIN_USER=admin
 # --webroot=~/.jenkins/war
 JENKINS_ARGS="--webroot=/var/run/jenkins/war --httpListenAddress=$HTTP_HOST --httpPort=$HTTP_PORT --ajp13Port=$AJP_PORT"
+
+<% if node[:jenkins][:server][:prefix] %>
+
+JENKINS_ARGS="$JENKINS_ARGS --prefix=<%= node[:jenkins][:server][:prefix] %>"
+	
+<% end %>

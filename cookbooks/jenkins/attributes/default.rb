@@ -26,8 +26,8 @@ default[:jenkins][:package_url] = "http://pkg.jenkins-ci.org"
 default[:jenkins][:java_home] = ENV['JAVA_HOME']
 
 default[:jenkins][:server][:home] = "/var/lib/jenkins"
-default[:jenkins][:server][:user] = "jenkins"
-
+default[:jenkins][:server][:user] = "jenkins" 
+  
 case node[:platform]
 when "debian", "ubuntu"
   default[:jenkins][:server][:group] = "nogroup"
@@ -37,6 +37,7 @@ end
 
 default[:jenkins][:server][:port] = 8080
 default[:jenkins][:server][:host] = node[:fqdn]
+default[:jenkins][:server][:prefix] = nil 
 default[:jenkins][:server][:url]  = "http://#{node[:jenkins][:server][:host]}:#{node[:jenkins][:server][:port]}"
 
 default[:jenkins][:iptables_allow] = "disable"
