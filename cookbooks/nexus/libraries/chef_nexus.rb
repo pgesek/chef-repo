@@ -48,7 +48,7 @@ class Chef
         begin
           data_bag_item = Chef::EncryptedDataBagItem.load(DATABAG, SSL_CERTIFICATE_DATABAG_ITEM)
         rescue Net::HTTPServerException => e
-          raise Nexus::EncryptedDataBagNotFound.new(CREDENTIALS_DATABAG_ITEM)
+          raise Nexus::EncryptedDataBagNotFound.new(SSL_CERTIFICATE_DATABAG_ITEM)
         end
         data_bag_item
       end

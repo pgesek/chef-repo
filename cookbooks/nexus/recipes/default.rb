@@ -19,7 +19,7 @@
 #
 #
 include_recipe "java"
-include_recipe "nginx"
+#include_recipe "nginx"
 
 user_home = "/#{node[:nexus][:user]}"
 
@@ -47,69 +47,69 @@ directory user_home do
   action :create
 end
 
-directory "#{node[:nginx][:dir]}/shared/certificates" do
-  owner "root"
-  group "root"
-  mode "700"
-  recursive true
-end
+#directory "#{node[:nginx][:dir]}/shared/certificates" do
+#  owner "root"
+#  group "root"
+#  mode "700"
+#  recursive true
+#end
 
-data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag
+#data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag
+#
+#if data_bag_item[node[:nexus][:ssl_certificate][:key]]
+#
+#  log "Using ssl_certificate data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
+#    level :info
+#  end
+#
+#  data_bag_item = data_bag_item[node[:nexus][:ssl_certificate][:key]]
+#  certificate = Chef::Nexus.get_ssl_certificate_crt(data_bag_item)
+#  key = Chef::Nexus.get_ssl_certificate_key(data_bag_item)
+#
+#  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
+#    content certificate
+#    mode "077"
+#    action :create
+#  end
+#
+#  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
+#    content key
+#    mode    "077"
+#    action  :create
+#  end
+#else
+#  log "Could not find ssl_certificate data bag, using default certificate." do
+#    level :warn
+#end
 
-if data_bag_item[node[:nexus][:ssl_certificate][:key]]
+#  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
+#    source "self_signed_cert.crt"
+#    mode   "077"
+#    action :create
+#  end
+#
+#  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
+#    source "self_signed_key.key"
+#    mode   "077"
+#    action :create
+#  end
+#end
 
-  log "Using ssl_certificate data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
-    level :info
-  end
-
-  data_bag_item = data_bag_item[node[:nexus][:ssl_certificate][:key]]
-  certificate = Chef::Nexus.get_ssl_certificate_crt(data_bag_item)
-  key = Chef::Nexus.get_ssl_certificate_key(data_bag_item)
-
-  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
-    content certificate
-    mode "077"
-    action :create
-  end
-
-  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
-    content key
-    mode    "077"
-    action  :create
-  end
-else
-  log "Could not find ssl_certificate data bag, using default certificate." do
-    level :warn
-  end
-
-  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
-    source "self_signed_cert.crt"
-    mode   "077"
-    action :create
-  end
-
-  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
-    source "self_signed_key.key"
-    mode   "077"
-    action :create
-  end
-end
-
-template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
-  source "nexus_proxy.nginx.conf.erb"
-  owner  "root"
-  group  "root"
-  mode   "0644"
-  variables(
-    :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt",
-    :ssl_key         => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
-    :listen_port     => node[:nexus][:nginx_proxy][:listen_port],
-    :server_name     => node[:nexus][:nginx_proxy][:server_name],
-    :fqdn            => node[:fqdn],
-    :server_options  => node[:nexus][:nginx][:server][:options],
-    :proxy_options   => node[:nexus][:nginx][:proxy][:options]
-  )
-end
+#template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
+#  source "nexus_proxy.nginx.conf.erb"
+#  owner  "root"
+#  group  "root"
+#  mode   "0644"
+#  variables(
+#    :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt",
+#    :ssl_key         => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
+#    :listen_port     => node[:nexus][:nginx_proxy][:listen_port],
+#    :server_name     => node[:nexus][:nginx_proxy][:server_name],
+#    :fqdn            => node[:fqdn],
+#    :server_options  => node[:nexus][:nginx][:server][:options],
+#    :proxy_options   => node[:nexus][:nginx][:proxy][:options]
+#  )
+#end
 
 directory node[:nexus][:mount][:nfs][:mount_point] do
   owner     node[:nexus][:user]
@@ -142,7 +142,7 @@ end
 #  only_if {node[:nexus][:mount][:nfs][:enable]}
 #end
 
-nginx_site 'nexus_proxy.conf'
+#nginx_site 'nexus_proxy.conf'
 
 artifact_deploy node[:nexus][:name] do
   version           node[:nexus][:version]
@@ -212,25 +212,25 @@ end
 service "nexus" do
   action :start
   provider Chef::Provider::Service::Init
-  notifies :restart, "service[nginx]", :immediately
+  #notifies :restart, "service[nginx]", :immediately
 end
 
-nexus_settings "baseUrl" do
-  value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
-  retries 3
-  retry_delay 8
-end
+#nexus_settings "baseUrl" do
+#  value "#{node[:nexus][:base_url]}"
+#  retries 3
+#  retry_delay 8
+#end
 
-nexus_settings "forceBaseUrl" do
-  value true
-end
+#nexus_settings "forceBaseUrl" do
+#  value true
+#end
 
 data_bag_item = Chef::Nexus.get_credentials_data_bag
 default_credentials = data_bag_item["default_admin"]
 updated_credentials = data_bag_item["updated_admin"]
 
-nexus_user "admin" do
-  action       :change_password
-  old_password default_credentials["password"]
-  password     updated_credentials["password"]
-end
+#nexus_user "admin" do
+#  action       :change_password
+#  old_password default_credentials["password"]
+#  password     updated_credentials["password"]
+#end
