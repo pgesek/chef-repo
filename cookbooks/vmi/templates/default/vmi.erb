@@ -1,0 +1,58 @@
+<VirtualHost *:80>
+	ServerAdmin <%= node[:vmi][:server_admin] %>
+	
+	DocumentRoot /var/www/
+	<Directory />
+	        Options FollowSymLinks
+	        AllowOverride None
+	</Directory>
+	<Directory /var/www/>
+	        Options Indexes FollowSymLinks MultiViews
+	        AllowOverride None
+	        Order allow,deny
+	        allow from all
+	        # This directive allows us to have apache2's default start page
+	        # in /apache2-default/, but still have / go to the right place
+	        #RedirectMatch ^/$ /apache2-default/
+	</Directory>
+
+	<Proxy http://localhost:*/*>
+    		Order deny,allow
+    		Allow from all
+  	</Proxy>
+
+  	ProxyPreserveHost on
+	
+	### Nexus ###
+	
+	ProxyPass <%= node[:nexus][:context_path] %>/ http://localhost:<%= node[:nexus][:port] %><%= node[:nexus][:context_path] %>/
+	
+	<Location <%= node[:nexus][:context_path] %>/>
+		ProxyPassReverse  http://localhost:<%= node[:nexus][:port] %><%= node[:nexus][:context_path] %>/
+	</Location>
+	
+	### Jenkins ###
+  	
+  	ProxyPass	<%= node[:jenkins][:server][:prefix] %>/  http://localhost:<%= node[:jenkins][:server][:port] %><%= node[:jenkins][:server][:prefix] %>/
+	
+	<Location <%= node[:jenkins][:server][:prefix] %>/>
+		ProxyPassReverse  http://localhost:<%= node[:jenkins][:server][:port] %><%= node[:jenkins][:server][:prefix] %>/
+	</Location>
+	
+	### Sonar ###
+	
+	ProxyPass <%= node['sonar']['web_context'] %>/  http://localhost:<%= node['sonar']['web_port'] %><%= node['sonar']['web_context'] %>/
+	
+	<Location <%= node['sonar']['web_context'] %>/>
+		ProxyPassReverse  http://localhost:<%= node['sonar']['web_port'] %><%= node['sonar']['web_context'] %>/
+	</Location>
+
+	ErrorLog /var/log/apache2/error.log
+	
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+	
+	CustomLog /var/log/apache2/access.log combined
+	ServerSignature On
+</VirtualHost>

@@ -1,0 +1,1 @@
+default[:vmi][:server_admin] = "pgesek@soldevelo.com"
