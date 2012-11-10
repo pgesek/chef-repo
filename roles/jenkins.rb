@@ -17,7 +17,9 @@ run_list "role[oracle-jdk7]",
 override_attributes(
   :jenkins => {
     :server => { 
-      :plugins => ["git", "greenballs", "locks-and-latches", "sonar", "performance", "github", "ci-game"],
+      :plugins => ["git", "greenballs", "locks-and-latches", "sonar", "performance", "github-api", "github", "ci-game", 
+                   "emotional-jenkins-plugin", "chucknorris", "monitoring", "statusmonitor", "mask-passwords", 
+                   "build-timeout", "jsgames" ],
       :host => "localhost",
       :port => 8060
     }
